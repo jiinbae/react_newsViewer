@@ -6,6 +6,7 @@ import { NewsProvider } from './contexts/NewsContent';
 import { TodoProvider } from './contexts/TodoContent';
 
 const App = (props) => {
+  console.log('[SUPER]')
   return (
     <>
       <NewsProvider>
