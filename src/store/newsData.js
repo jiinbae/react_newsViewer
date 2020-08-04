@@ -43,14 +43,15 @@ export const initialValue = {
     }
 };
 
-export const GET_POST = 'store/GET_POST'
+export const GET_POST = 'store/GET_POST';
 
-export async function getpost(country, category) {
+export async function getPost(country, category) {
 // getpost 불러온 거 확인
 
     return {
         type: GET_POST,
-        post: url.data
+        // post는 받아온 country의 category 뉴스.
+        newPost: initialValue.state.newsContent[country][category] // ??? 어떻게 해야할까? 
     };
 }
 
@@ -58,11 +59,9 @@ function newsData(state = initialValue, action) {
   // console.log(`${JSON.stringify(action)}`)
     switch(action.type) {
         case GET_POST:
-            // console.log('[REDUX]ADD ITEM')
             // console.log(`${JSON.stringify(state)}`)            
-            // let newState = {productsList:[...state.productsList]}
-            let newState = {...state.newsContent[country][category]} // immer나 중첩되게 한 번 더 복사.
-            newState.productsList.push(action.newItem)
+            let newState = {...state.newsContent}
+            newState.state.newsContent.push(action.newPost)
             return newState
         default:
             return state

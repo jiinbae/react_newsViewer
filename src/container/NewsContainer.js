@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect, useSelector } from 'react-redux';
 import NewsList from '../components/NewsList';
-import { usNews, krNews, cnNews, jpNews } from '../modules/NewsReduxRefac';
-import { getPost, getUsers } from '../modules/sample';
 
 // const { useEffect } = React;
 

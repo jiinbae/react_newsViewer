@@ -4,6 +4,9 @@ import NewsItem from './NewsItem';
 import axios from 'axios';
 import usePromise from '../lib/usePromise';
 import NewsContext from '../contexts/NewsContent';
+import { getPost } from '../store/newsData';
+import { connect } from 'react-redux';
+
 
 const NewsListBlock = styled.div`
   box-sizing: border-box;
@@ -18,6 +21,7 @@ const NewsListBlock = styled.div`
   }
 `;
 
+// context API X, redux X.
 // const NewsList = () => {
 //   const [articles, setArticles] = useState(null);
 //   const [loading, setLoading] = useState(false);
@@ -58,8 +62,82 @@ const NewsListBlock = styled.div`
 //   );
 // };
 
-const NewsList = ({ country, category }) => {
-  const { state, action } = useContext(NewsContext);
+
+// context API 사용했을 때.
+// const NewsList = ({ country, category }) => {
+//   const { state, action } = useContext(NewsContext);
+
+//   const [loading, response, error, setResponse] = usePromise(() => {
+//     const countryQuery = `country=${country}`; // 국가 변경하기
+//     const query = category === 'all' ? '' : `&category=${category}`; // category 값에 따라 주소가 동적으로 변화. query 요청 시 포함.
+//     // console.log(`[USE_PROMISE]${country}, ${category} `);
+//     if (state.newsContent[country][category].length === 0) {
+//       let response = axios.get(
+//         `https://newsapi.org/v2/top-headlines?${countryQuery}${query}`, // 국가 변경 및 카테고리 변경.
+//         {
+//           headers: {
+//             'x-api-key': '0106e2c7f2e94c57bfb33b63b97f2a60',
+//           },
+//         },
+//       );
+//       return response;
+//     } else {
+//       let response = {
+//         data: {
+//           articles: state.newsContent[country][category],
+//         },
+//       };
+//       return response;
+//     }
+//   }, [country, category]);
+
+//   // 대기중일 때
+//   if (loading) {
+//     return <NewsListBlock>대기중...</NewsListBlock>;
+//   }
+//   // 아직 response 값이 설정되지 않았을 때
+//   // if (!response) {
+//   //   // return null;
+//   // }
+//   if (response) {
+//     // console.log(`[RESPONSE] ${country} ${category} ${response.data.articles}`);
+//     let nc = { state: { ...state }, action: { ...action } };
+//     nc.state.newsContent[country][category] = response.data.articles;
+//     // nc.articles = response.data.articles; ???
+
+//     action.setNewsContent(nc);
+//     setResponse(null);
+//   }
+
+//   // 에러가 발생했을 때
+//   if (error) {
+//     return <NewsListBlock>에러 발생!</NewsListBlock>;
+//   }
+
+//   // response 값이 유효할 때
+//   // const { articles } = response.data;
+//   const articles = state.newsContent[country][category];
+
+//   console.log(articles);
+
+//   return (
+//     <NewsListBlock>
+//       {articles.map((article) => (
+//         <NewsItem key={article.url} article={article} />
+//       ))}
+//     </NewsListBlock>
+//   );
+// };
+
+// export default NewsList;
+
+// 카테고리를 누르면 정보를 받아온다.
+
+const NewsList = ({ country, category, onGetPost }) => { // reduxCart 역할을 하는 친구가 없다.
+  const onSubmitNews = (e) => {
+    let item = e.target.innerHTML
+    onGetPost(item)
+  }
 
   const [loading, response, error, setResponse] = usePromise(() => {
     const countryQuery = `country=${country}`; // 국가 변경하기
@@ -97,7 +175,6 @@ const NewsList = ({ country, category }) => {
     // console.log(`[RESPONSE] ${country} ${category} ${response.data.articles}`);
     let nc = { state: { ...state }, action: { ...action } };
     nc.state.newsContent[country][category] = response.data.articles;
-    // nc.articles = response.data.articles; ???
 
     action.setNewsContent(nc);
     setResponse(null);
@@ -123,5 +200,12 @@ const NewsList = ({ country, category }) => {
   );
 };
 
-export default NewsList;
-
+const mapStateToProps = (state) => {
+  return { newsContent : state.newsContent } // 맞는지 모르겠다.
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onGetPost: (item) => dispatch(getPost(item))
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(NewsList);
